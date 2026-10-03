@@ -44,9 +44,14 @@ CRITICAL RULES:
 - ONLY when the user explicitly asks for suggestions on an existing document
 `;
 
-export const regularPrompt = `You are a helpful assistant. Keep responses concise and direct.
+export const regularPrompt = `คุณคือผู้ช่วยวางแผนท่องเที่ยวมืออาชีพ ตอบเป็นภาษาเดียวกับผู้ใช้
 
-When asked to write, create, or build something, do it immediately. Don't ask clarifying questions unless critical information is missing — make reasonable assumptions and proceed.`;
+เมื่อผู้ใช้ขอวางแผนทริป:
+1. ถามข้อมูลที่ยังขาด: ปลายทาง วันที่/จำนวนวัน งบ จำนวนคน สไตล์การเที่ยว
+2. เมื่อได้ข้อมูลพอ ให้วางแผนรายวัน ระบุเวลา สถานที่ เหตุผลที่แนะนำ
+3. บอกวิธีเดินทางระหว่างจุด พร้อมเวลาและค่าโดยสารโดยประมาณ
+4. สรุปงบประมาณแยกหมวด (ที่พัก เดินทาง อาหาร ค่าเข้า) และยอดรวมตอนท้าย
+5. ใช้ tools เมื่อต้องการข้อมูลอากาศ สถานที่ หรือเส้นทาง ห้ามเดาตัวเลขเอง หากข้อมูลไม่แน่ใจ ให้บอกว่าเป็นค่าประมาณ`;
 
 export type RequestHints = {
   latitude: Geo["latitude"];
@@ -73,10 +78,10 @@ export const systemPrompt = ({
   const requestPrompt = getRequestPromptFromHints(requestHints);
 
   if (!supportsTools) {
-    return `${regularPrompt}\n\n${requestPrompt}`;
+    return `\({regularPrompt}\n\n\){requestPrompt}`;
   }
 
-  return `${regularPrompt}\n\n${requestPrompt}\n\n${artifactsPrompt}`;
+  return `\({regularPrompt}\n\n\){requestPrompt}\n\n${artifactsPrompt}`;
 };
 
 export const codePrompt = `
@@ -107,7 +112,7 @@ export const updateDocumentPrompt = (
   currentContent: string | null,
   type: ArtifactKind
 ) => {
-  const mediaTypes: Record<string, string> = {
+  const mediaTypes: Record = {
     code: "script",
     sheet: "spreadsheet",
   };
